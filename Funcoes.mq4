@@ -26,6 +26,19 @@ int CountTrades(int ordemTipo, int numeroMagico, string simbolo) {
 		for(index = OrdersTotal() - 1; index >= 0 ; index--) {
 			if(OrderSelect(index,SELECT_BY_POS,MODE_TRADES) {
 			if(OrderSymbol() == stringAux && OrderMagicNumber() == numeroMagico && OrderType() == ordemTipo) {
+			
+			dfghjklç
+			~
+			fasdgkdsaldsa
+			dsa
+			dsadsa
+			
+			/*** teste *///
+			
+			dsadsad
+			sa
+			das
+			
 					intContador++;
 				} else {
 					continue;
