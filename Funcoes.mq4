@@ -20,9 +20,6 @@ int CountTrades(int ordemTipo, int numeroMagico, string simbolo) {
 	if(OrdersTotal()<1) {
 		return (0);
 	} else {
-
-		if(usaSimboloGrafico) stringAux = Symbol();
-
 		for(index = OrdersTotal() - 1; index >= 0 ; index--) {
 			if(OrderSelect(index,SELECT_BY_POS,MODE_TRADES) {
 			if(OrderSymbol() == stringAux && OrderMagicNumber() == numeroMagico && OrderType() == ordemTipo) {
