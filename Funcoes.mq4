@@ -47,7 +47,7 @@ int TotalOrdens(int ordemTipo, int numeroMagico, string simbolo) {
 	+ EURUSD:Simbolo estatico, varia de acordo com o seu banco.
 */
 double PrecoMedio(int ordemTipo, int numeroMagico, string simbolo){
-   int total = CountTrades(OP_BUY,numeroMagico,simbolo);
+   int total = CountTrades(ordemTipo,numeroMagico,simbolo);
    double precoMedio = 0;
    double contador = 0;
    int indice = 0;
@@ -87,7 +87,7 @@ double PrecoMedio(int ordemTipo, int numeroMagico, string simbolo){
 	+ EURUSD:Simbolo estatico, varia de acordo com o seu banco.
 */
 double UltimoPrecoAbertura(int ordemTipo,int numeroMagico, string simbolo) {
-   int total = CountTrades(OP_BUY,numeroMagico,simbolo);
+   int total = CountTrades(ordemTipo,numeroMagico,simbolo);
    double precoAntigo = 0;
    int indice = 0;
    int ticketAntigo = 0;
