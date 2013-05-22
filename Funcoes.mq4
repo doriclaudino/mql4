@@ -139,3 +139,39 @@ double TotalLotes(int ordemTipo,int numeroMagico, string simbolo) {
 	}		
    return (totalLotes);
 }
+
+
+/*
++ ordemTipo
+	+ OP_BUY:buying position,
+	+ OP_SELL:selling position,
+	+ OP_BUYLIMIT:buy limit pending position,
+	+ OP_BUYSTOP:buy stop pending position,
+	+ OP_SELLLIMIT:sell limit pending position,
+	+ OP_SELLSTOP:sell stop pending position.
++ numeroMagico
+	+ 0: Sem filtro
++ simbolo
+	+ Symbol():Simbolo do grafico
+	+ EURUSD:Simbolo estatico, varia de acordo com o seu banco.
+*/
+double UltimoLoteAberto(int ordemTipo,int numeroMagico, string simbolo) {
+   int total = CountTrades(ordemTipo,numeroMagico,simbolo);
+   double ultimoLote = 0;
+   int indice = 0;
+   int ticketAntigo = 0;
+   int ticketAtual = 0;
+   
+      for (indice = total - 1; indice >= 0; indice--) {
+         if(OrderSelect(indice,SELECT_BY_POS,MODE_TRADES)) {
+            if (OrderSymbol() == simbolo && OrderMagicNumber() == numeroMagico && OrderType() == ordemTipo) {
+               ticketAntigo = OrderTicket();
+				if (ticketAntigo > ticketAtual) {
+					ultimoLote = OrderLots();
+					ticketAtual = ticketAntigo;
+				}
+            }
+         }
+      }     
+   return (ultimoLote);
+}
