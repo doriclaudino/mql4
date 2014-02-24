@@ -1,12 +1,10 @@
-
 int GetOrdersTotal(int ordertype, int magicnumber, string symbol) {
 	int count = 0;
-	int index = 0;
-
+	
 	if(OrdersTotal()<1) {
 		return (0);
 	} else {
-		for(index = OrdersTotal() - 1; index >= 0 ; index--) {
+		for (int index = OrdersTotal() - 1; index >= 0; index--) {
 			if(OrderSelect(index,SELECT_BY_POS,MODE_TRADES)) {
 			if(OrderSymbol() == symbol && OrderMagicNumber() == magicnumber && OrderType() == ordertype) {
 					count++;
@@ -22,12 +20,12 @@ int GetOrdersTotal(int ordertype, int magicnumber, string symbol) {
 
 int SendOrder(int ordertype, int magicnumber, string symbol, double Lot, double slippage, string comment){
 int ticket = 0;
-      for(int n=5;n>=0;n--){
-	  
+
+      for(int n=5;n>=0;n--){	  
 		if(ordertype == OP_BUY)
-			ticket = OrderSend(symbol,ordertype,Lot,Ask,slippage,0,0,comment,magicnumber,NULL,NULL); 
+			ticket = OrderSend(symbol,ordertype,Lot,Ask,slippage,0,0,comment,magicnumber,NULL,Blue); 
 		else
-			ticket = OrderSend(symbol,ordertype,Lot,Bid,slippage,0,0,comment,magicnumber,NULL,NULL); 			
+			ticket = OrderSend(symbol,ordertype,Lot,Bid,slippage,0,0,comment,magicnumber,NULL,Red); 			
 		            
          int err = GetLastError();
          if (err == 0/* NO_ERROR */) break;
@@ -40,13 +38,12 @@ int ticket = 0;
 
 double GetLotsTotal(int ordertype,int magicnumber, string symbol) {
    int total = GetOrdersTotal(ordertype,magicnumber,symbol);
-   int index = 0;
    double lotstotal = 0;
 	
 	if(total<1){
 		return(0);
 	}else{   
-		for (index = total - 1; index >= 0; index--) {
+		for (int index = OrdersTotal() - 1; index >= 0; index--) {
 			if(OrderSelect(index,SELECT_BY_POS,MODE_TRADES)) {
 				if (OrderSymbol() == symbol && OrderMagicNumber() == magicnumber && OrderType() == ordertype) {
 					lotstotal += OrderLots();
@@ -58,13 +55,11 @@ double GetLotsTotal(int ordertype,int magicnumber, string symbol) {
 }
 
 double GetLastOpenPrice(int ordertype,int magicnumber, string symbol) {
-   int total = GetOrdersTotal(ordertype,magicnumber,symbol);
    double oldprice = 0;
-   int index = 0;
    int oldticket = 0;
    int newticket = 0;
    
-      for (index = total - 1; index >= 0; index--) {
+	  for (int index = OrdersTotal() - 1; index >= 0; index--) {
          if(OrderSelect(index,SELECT_BY_POS,MODE_TRADES)) {
             if (OrderSymbol() == symbol && OrderMagicNumber() == magicnumber && OrderType() == ordertype) {
                oldticket = OrderTicket();
@@ -79,13 +74,11 @@ double GetLastOpenPrice(int ordertype,int magicnumber, string symbol) {
 }
 
 double GetLastOpenLot(int ordertype,int magicnumber, string symbol) {
-   int total = GetOrdersTotal(ordertype,magicnumber,symbol);
    double lastlot = 0;
-   int index = 0;
    int oldticket = 0;
    int newticket = 0;
    
-      for (index = total - 1; index >= 0; index--) {
+		for (int index = OrdersTotal() - 1; index >= 0; index--) {
          if(OrderSelect(index,SELECT_BY_POS,MODE_TRADES)) {
             if (OrderSymbol() == symbol && OrderMagicNumber() == magicnumber && OrderType() == ordertype) {
                oldticket = OrderTicket();
@@ -103,12 +96,11 @@ double GetMedianPrice(int ordertype, int magicnumber, string symbol){
    int total = GetOrdersTotal(ordertype,magicnumber,symbol);
    double medianprice = 0;
    double count = 0;
-   int index = 0;
    
 	if(total<1) {
 		return (0);
 	} else {
-		for(index = total - 1; index >= 0 ; index--) {
+		for (int index = OrdersTotal() - 1; index >= 0; index--) {
 			if(OrderSelect(index,SELECT_BY_POS,MODE_TRADES)) {
 			if(OrderSymbol() == symbol && OrderMagicNumber() == magicnumber && OrderType() == ordertype) {
 					medianprice += OrderOpenPrice() * OrderLots();
@@ -144,43 +136,40 @@ double newtakeprofit = 0;
 
 void SyncProfit(int ordertype,int magicnumber, string symbol, double lucro){  
 int total = GetOrdersTotal(ordertype,magicnumber,symbol); 
-int index = 0;
 bool modify = false;
 
-	if(total<1){
+	if(total<1 || lucro < 1){
 		return(0);
 	}else{   
-		for (index = total - 1; index >= 0; index--) {
+	double medianprice = GetMedianPrice(ordertype,magicnumber,symbol);
+    double newtakeprofit = GetTakeProfit(ordertype,medianprice, lucro);  	
+	
+		for (int index = OrdersTotal() - 1; index >= 0; index--) {
 			if(OrderSelect(index,SELECT_BY_POS,MODE_TRADES)) {
-				if (OrderSymbol() == symbol && OrderMagicNumber() == magicnumber && OrderType() == ordertype) {
-				
+				if (OrderSymbol() == symbol && OrderMagicNumber() == magicnumber && OrderType() == ordertype) {				
 					int    TK = OrderTicket();
 					double TP = OrderTakeProfit();
 					double SL = OrderStopLoss();
 					double OP = OrderOpenPrice();
-					double newtakeprofit = 0;
-					double medianprice = GetMedianPrice(ordertype,magicnumber,symbol);
-
-					switch(OrderType())	{
-						case 0://buy
-							if(TP != GetTakeProfit(ordertype,medianprice, lucro)){
+					color cor;
+					
+					if(TP != newtakeprofit){
+						switch(OrderType())	{
+							case 0://buy
+								modify = true;    								 
+								cor = Blue;  
+							break;
+							case 1://sell
 								modify = true;    
-								newtakeprofit = GetTakeProfit(ordertype,medianprice, lucro);     
-							}   
-						break;
-						
-						case 1://sell
-							if(TP != GetTakeProfit(ordertype,medianprice, lucro)){
-								modify = true;    
-								newtakeprofit = GetTakeProfit(ordertype,medianprice, lucro);        
-							}   					
-						break;
-					}//exit switch
+								cor = Red;    				
+							break;
+						}
+					}					
 					
-					if(modify == false) continue;
-					
-					OrderModify(TK,OP,SL,newtakeprofit,0);					
-					
+					if(modify == false) 
+						continue;
+					else
+						OrderModify(TK,OP,SL,newtakeprofit,0,cor);
 				}
 			}
 		}
